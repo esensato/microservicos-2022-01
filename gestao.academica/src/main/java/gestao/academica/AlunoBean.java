@@ -1,12 +1,20 @@
 package gestao.academica;
 
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class AlunoBean {
 	
 	private int id;
 	
 	private String nome;
 	
-	private String curso;	
+	@NotNull (message = "Informe o curso para o novo aluno")
+	private String curso;
+	
+	@JsonIgnore
+	private String senha;
 
 	public AlunoBean(int id, String nome, String curso) {
 		super();
@@ -38,5 +46,14 @@ public class AlunoBean {
 	public void setCurso(String curso) {
 		this.curso = curso;
 	}
+
+	public String getSenha() {
+		return senha;
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
+	
 
 }

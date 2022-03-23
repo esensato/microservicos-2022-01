@@ -5,6 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @Entity
 public class Turma {
 	
@@ -14,6 +16,7 @@ public class Turma {
 	
 	private String nome;
 	
+	@Schema(name = "total", description = "Total de alunos", required = true, example = "10")
 	private int total;
 	
 	public Turma() {

@@ -12,27 +12,45 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping(value = "/turma")
 public class TurmaController {
-	
+
 	@Autowired
 	TurmaDAO dao;
-	
+
+	@Operation(summary = "Criar uma nova turma", 
+			description = "Cria uma nova turma de alunos", 
+			tags = { "Criar Turma" })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Turma criada",
+			content = { @Content(mediaType = "application/json",
+			schema = @Schema(implementation = Turma.class)) }),
+			@ApiResponse(responseCode = "400", description = "Total inválido",
+			content = @Content) })	
 	@PostMapping(path = "/criar")
 	public ResponseEntity<Turma> criar(@RequestBody Turma turma) {
-		
+
+		if (turma.getTotal() < 0) {
+			return new ResponseEntity<Turma>(HttpStatus.BAD_REQUEST);
+		}
 		Turma turmaCriada = dao.save(turma);
 		return new ResponseEntity<Turma>(turmaCriada, HttpStatus.OK);
-		
-		
+
+
 	}
-	
+
 	@PutMapping(path = "/adicionar/{turma}/{total}")
 	public ResponseEntity<Turma> adicionar(@PathVariable String turma, @PathVariable Integer total) {
-		
+
 		Turma t = dao.findByNome(turma);
-		
+
 		if (t != null) {
 			t.setTotal(t.getTotal() + total);
 			dao.save(t);
@@ -40,14 +58,14 @@ public class TurmaController {
 		} else {
 			return new ResponseEntity<Turma>(HttpStatus.NOT_FOUND);
 		}
-		
+
 	}
-	
+
 	@DeleteMapping(path = "/remover/{turma}/{total}")
 	public ResponseEntity<Turma> remover(@PathVariable String turma, @PathVariable Integer total) {
-		
+
 		Turma t = dao.findByNome(turma);
-		
+
 		if (t != null) {
 			t.setTotal(t.getTotal() - total);
 			dao.save(t);
@@ -55,13 +73,13 @@ public class TurmaController {
 		} else {
 			return new ResponseEntity<Turma>(HttpStatus.NOT_FOUND);
 		}
-		
+
 	}
-	
+
 	@GetMapping(path="/todos")
 	public ResponseEntity<Iterable<Turma>> todos() {
-		
+
 		return new ResponseEntity<Iterable<Turma>>(dao.findAll(), HttpStatus.OK);
-		
+
 	}
 }

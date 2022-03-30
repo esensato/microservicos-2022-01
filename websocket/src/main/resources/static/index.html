@@ -1,0 +1,44 @@
+<html>
+
+<body>
+
+<label for="mensagem">Mensagem:</label>
+<input type="text" id="mensagem">
+<button onclick="sendMessage()">Enviar</button>
+<ul id="message-list"></ul>
+
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+<script>
+
+// estabelece a conexão com o endpoint principal
+let sock = new SockJS("http://localhost:8081/mensagem");
+// cria o cliente Websocket utilizando o protocolo STOMP
+let client = Stomp.over(sock);
+
+// efetua a conexão e registra a função de callback
+client.connect({}, frame => {
+	console.log('Conexao estabelecida!');
+// se inscfeve no tópico "/topic/messages" para receber as mensagens
+	client.subscribe("/topic/messages", payload => {
+		console.log(payload.body);
+		let message_list = document.getElementById('message-list');
+		let message = document.createElement('li');
+		message.appendChild(document.createTextNode(JSON.parse(payload.body).mensagem));
+		message_list.appendChild(message);
+});
+});
+
+
+// envia a mensagem
+function sendMessage(){
+	let input = document.getElementById("mensagem");
+	let message = input.value;
+	client.send('/app/chat', {}, JSON.stringify({mensagem: message}));
+}
+
+</script>
+</html>

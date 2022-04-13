@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -35,29 +37,26 @@ public class TurmaController {
 			@ApiResponse(responseCode = "400", description = "Total inválido",
 			content = @Content) })	
 	@PostMapping(path = "/criar")
-	public ResponseEntity<Turma> criar(@RequestBody Turma turma) {
+	public Mono<Turma> criar(@RequestBody Turma turma) {
 
 		if (turma.getTotal() < 0) {
-			return new ResponseEntity<Turma>(HttpStatus.BAD_REQUEST);
+			return Mono.empty();
 		}
-		Turma turmaCriada = dao.save(turma);
-		return new ResponseEntity<Turma>(turmaCriada, HttpStatus.OK);
-
+		return dao.save(turma);
 
 	}
 
 	@PutMapping(path = "/adicionar/{turma}/{total}")
-	public ResponseEntity<Turma> adicionar(@PathVariable String turma, @PathVariable Integer total) {
+	public Mono<Turma> adicionar(@PathVariable String turma, @PathVariable Integer total) {
 
 		Turma t = dao.findByNome(turma);
 
 		if (t != null) {
 			t.setTotal(t.getTotal() + total);
 			dao.save(t);
-			return new ResponseEntity<Turma>(t, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<Turma>(HttpStatus.NOT_FOUND);
+			return Mono.just(t);
 		}
+		else return Mono.empty();
 
 	}
 
@@ -77,9 +76,9 @@ public class TurmaController {
 	}
 
 	@GetMapping(path="/todos")
-	public ResponseEntity<Iterable<Turma>> todos() {
+	public Flux<Turma> todos() {
 
-		return new ResponseEntity<Iterable<Turma>>(dao.findAll(), HttpStatus.OK);
+		return dao.findAll();
 
 	}
 }

@@ -1,17 +1,14 @@
 package gestao.turmas;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Entity
+@Table
 public class Turma {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int id;
 	
 	private String nome;
